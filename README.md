@@ -1,4 +1,4 @@
-# Backend Assessment - WorkLog Settlement System
+# WorkLog Settlement System
 
 ## Assessment Task
 
@@ -56,7 +56,6 @@ To submit your assessment, please follow these steps:
 
 2. **Raise a Pull Request**
    - Create a Pull Request from your personal fork back to this repository.
-   - Include a clear description of your implementation approach and design decisions.
 
 3. **Required Documentation**
    Your PR must include:
