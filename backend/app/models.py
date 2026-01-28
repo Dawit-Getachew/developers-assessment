@@ -3,6 +3,15 @@ import uuid
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
+# Import worklog models for Alembic to detect
+from app.api.routes.worklog.models import (  # noqa: F401
+    Adjustment,
+    Remittance,
+    Task,
+    TimeSegment,
+    WorkLog,
+)
+
 
 # Shared properties
 class UserBase(SQLModel):

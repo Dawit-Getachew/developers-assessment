@@ -1,0 +1,146 @@
+{
+    "list-all-worklogs": {
+        "response": {
+            "data": [
+                {
+                    "id": "6bd7f89b-fa24-487b-9544-915f7aa6291f",
+                    "task_id": "7c245809-4f16-41a3-9f87-5d763dbe9cbe",
+                    "worker_id": "07f4d692-704f-4ac5-a6f7-28708ad9a660",
+                    "hourly_rate": "60.00",
+                    "remittance_id": null,
+                    "created_at": "2026-01-28T13:10:37.568114",
+                    "time_segments": [
+                        {
+                            "id": "db2ae287-5347-4c4a-8f86-3f0608a45f63",
+                            "start_time": "2026-01-23T11:10:37.508207",
+                            "end_time": "2026-01-23T13:10:37.508207",
+                            "status": "ACTIVE",
+                            "settlement_status": "REMITTED"
+                        },
+                        {
+                            "id": "f817c85a-13ec-490f-8d84-ba13f49ee8cb",
+                            "start_time": "2026-01-27T10:10:37.508207",
+                            "end_time": "2026-01-27T13:10:37.508207",
+                            "status": "ACTIVE",
+                            "settlement_status": "UNREMITTED"
+                        }
+                    ],
+                    "adjustments": [
+                        {
+                            "id": "57988a12-97d2-4402-9088-027caddd2a20",
+                            "amount": "-30.00",
+                            "reason": "Quality issue - bug found",
+                            "type": "DEDUCTION",
+                            "settlement_status": "UNREMITTED"
+                        }
+                    ],
+                    "amounts": {
+                        "remitted_amount": "120.00",
+                        "unremitted_amount": "150.00",
+                        "total_amount": "270.00"
+                    },
+                    "amount": "270.00",
+                    "remittance_status": "UNREMITTED"
+                },
+                {
+                    "id": "687c2618-d64e-4feb-b4c5-da6110a9ba6c",
+                    "task_id": "7697ac82-02a4-40cb-8d16-13e930125795",
+                    "worker_id": "07f4d692-704f-4ac5-a6f7-28708ad9a660",
+                    "hourly_rate": "75.00",
+                    "remittance_id": null,
+                    "created_at": "2026-01-28T13:10:37.586138",
+                    "time_segments": [
+                        {
+                            "id": "362bcda5-8232-4337-aadb-f1e845139873",
+                            "start_time": "2026-01-28T05:10:37.508207",
+                            "end_time": "2026-01-28T09:10:37.508207",
+                            "status": "ACTIVE",
+                            "settlement_status": "UNREMITTED"
+                        },
+                        {
+                            "id": "a0830a8a-0923-4ba5-8f40-d7d0f38a58f0",
+                            "start_time": "2026-01-28T10:10:37.508207",
+                            "end_time": "2026-01-28T13:10:37.508207",
+                            "status": "ACTIVE",
+                            "settlement_status": "UNREMITTED"
+                        },
+                        {
+                            "id": "7e4cad03-320b-4608-a668-cc864043df01",
+                            "start_time": "2026-01-28T03:10:37.508207",
+                            "end_time": "2026-01-28T05:10:37.508207",
+                            "status": "DISPUTED",
+                            "settlement_status": "UNREMITTED"
+                        }
+                    ],
+                    "adjustments": [],
+                    "amounts": {
+                        "remitted_amount": "0",
+                        "unremitted_amount": "525.00",
+                        "total_amount": "525.00"
+                    },
+                    "amount": "525.00",
+                    "remittance_status": "UNREMITTED"
+                },
+                {
+                    "id": "7c3c8cb1-f16a-4f54-89d4-ce0fd5f20bd4",
+                    "task_id": "10d2acbf-0b2b-40b4-956f-16080e4b03de",
+                    "worker_id": "07f4d692-704f-4ac5-a6f7-28708ad9a660",
+                    "hourly_rate": "50.00",
+                    "remittance_id": "d191803e-6cd8-457b-b60f-3f118347975c",
+                    "created_at": "2026-01-28T13:10:37.558807",
+                    "time_segments": [
+                        {
+                            "id": "add4e33e-909e-4568-8b1b-32883c3fb304",
+                            "start_time": "2026-01-21T09:10:37.508207",
+                            "end_time": "2026-01-21T13:10:37.508207",
+                            "status": "ACTIVE",
+                            "settlement_status": "REMITTED"
+                        }
+                    ],
+                    "adjustments": [
+                        {
+                            "id": "48ac96f4-c459-4b5b-97ab-0df4aa7b837b",
+                            "amount": "50.00",
+                            "reason": "Bonus for early completion",
+                            "type": "BONUS",
+                            "settlement_status": "REMITTED"
+                        }
+                    ],
+                    "amounts": {
+                        "remitted_amount": "250.00",
+                        "unremitted_amount": "0",
+                        "total_amount": "250.00"
+                    },
+                    "amount": "250.00",
+                    "remittance_status": "REMITTED"
+                }
+            ],
+            "count": 3
+        }
+    },
+    "generate-remittances": {
+        "request_body": {
+            "dry_run": true
+        },
+        "response": {
+            "remittances_created": 1,
+            "total_gross_amount": "705.00",
+            "total_net_amount": "675.00",
+            "remittances": [
+                {
+                    "id": "21cb536f-b4f0-4e63-89b0-42f3b5f4980c",
+                    "worker_id": "07f4d692-704f-4ac5-a6f7-28708ad9a660",
+                    "gross_amount": "705.00",
+                    "net_amount": "675.00",
+                    "status": "COMPLETED",
+                    "worklogs_count": 2,
+                    "period_start": "2026-01-01",
+                    "period_end": "2026-01-31"
+                }
+            ],
+            "dry_run": true,
+            "period_start": "2026-01-01",
+            "period_end": "2026-01-31"
+        }
+    }
+}

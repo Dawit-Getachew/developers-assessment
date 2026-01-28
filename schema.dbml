@@ -1,0 +1,143 @@
+// WorkLog Settlement System - Database Schema
+// ===========================================
+// 
+// This schema supports a settlement system that compensates workers based on
+// time logged against tasks. Key design considerations:
+//
+// 1. Work can evolve after payment - new segments can be added to settled worklogs
+// 2. Adjustments can be retroactive - deductions applied to already settled work
+// 3. Settlement attempts can fail - remittances track status and failure reasons
+//
+// Settlement is delta-based: each segment/adjustment tracks its own settlement
+// status, allowing incremental payments as work is added.
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+Enum time_segment_status {
+  ACTIVE      [note: 'Counted toward payment']
+  REMOVED     [note: 'Deleted or cancelled']
+  DISPUTED    [note: 'Under review, not counted']
+}
+
+Enum settlement_status {
+  UNREMITTED  [note: 'Not yet paid']
+  REMITTED    [note: 'Included in a remittance']
+}
+
+Enum adjustment_type {
+  DEDUCTION   [note: 'Quality issue - negative amount']
+  BONUS       [note: 'Extra payment - positive amount']
+  CORRECTION  [note: 'Error fix - can be +/-']
+}
+
+Enum remittance_status {
+  PENDING     [note: 'Created, not yet processed']
+  PROCESSING  [note: 'Payment in progress']
+  COMPLETED   [note: 'Successfully paid']
+  FAILED      [note: 'Payment failed']
+  CANCELLED   [note: 'Manually cancelled']
+}
+
+// =============================================================================
+// CORE TABLES
+// =============================================================================
+
+Table user {
+  id uuid [pk, note: 'Referenced from existing user table']
+  email varchar(255)
+  full_name varchar(255)
+}
+
+Table task {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  title varchar(255) [not null]
+  description varchar(1024)
+  created_at timestamp [not null, default: `now()`]
+  
+  Note: 'Billable task that workers log time against'
+}
+
+Table worklog {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  task_id uuid [not null, ref: > task.id]
+  worker_id uuid [not null, ref: > user.id]
+  hourly_rate decimal(10,2) [not null, default: 0]
+  total_remitted_amount decimal(12,2) [not null, default: 0, note: 'Running total of amounts already settled']
+  remittance_id uuid [ref: > remittance.id, note: 'Link to most recent remittance']
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    task_id
+    worker_id
+  }
+  
+  Note: 'Container for work done by a worker on a task'
+}
+
+Table time_segment {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  worklog_id uuid [not null, ref: > worklog.id]
+  start_time timestamp [not null]
+  end_time timestamp [not null]
+  status time_segment_status [not null, default: 'ACTIVE']
+  settlement_status settlement_status [not null, default: 'UNREMITTED']
+  remittance_id uuid [ref: > remittance.id, note: 'Remittance that settled this segment']
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    worklog_id
+  }
+  
+  Note: 'Individual time entry within a worklog. Tracks own settlement status for delta-based payments.'
+}
+
+Table adjustment {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  worklog_id uuid [not null, ref: > worklog.id]
+  amount decimal(10,2) [not null, note: 'Negative for deductions, positive for bonuses']
+  reason varchar(500) [not null]
+  type adjustment_type [not null]
+  settlement_status settlement_status [not null, default: 'UNREMITTED']
+  remittance_id uuid [ref: > remittance.id, note: 'Remittance that settled this adjustment']
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    worklog_id
+  }
+  
+  Note: 'Quality deduction or bonus. Supports retroactive adjustments via settlement_status tracking.'
+}
+
+Table remittance {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  worker_id uuid [not null, ref: > user.id]
+  gross_amount decimal(12,2) [not null, default: 0, note: 'Total positive amounts']
+  net_amount decimal(12,2) [not null, default: 0, note: 'Net after deductions']
+  status remittance_status [not null, default: 'PENDING']
+  failure_reason varchar(500) [note: 'Reason if status is FAILED/CANCELLED']
+  period_start timestamp
+  period_end timestamp
+  created_at timestamp [not null, default: `now()`]
+  processed_at timestamp [note: 'When payment was completed']
+  
+  indexes {
+    worker_id
+  }
+  
+  Note: 'Single payout to a worker for a settlement period. Tracks both gross and net for audit purposes.'
+}
+
+// =============================================================================
+// RELATIONSHIPS SUMMARY
+// =============================================================================
+
+// task 1---* worklog           : A task has many worklogs
+// user 1---* worklog           : A user (worker) has many worklogs
+// worklog 1---* time_segment   : A worklog has many time segments
+// worklog 1---* adjustment     : A worklog has many adjustments
+// user 1---* remittance        : A user receives many remittances
+// remittance 1---* worklog     : A remittance covers many worklogs
+// remittance 1---* time_segment: A remittance settles many segments
+// remittance 1---* adjustment  : A remittance settles many adjustments
